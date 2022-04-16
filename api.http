@@ -1,0 +1,13 @@
+POST http://localhost:8080/user/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin"
+}
+
+###
+GET http://localhost:8080/user/queryUserByUsername?username=admin
+Accept: application/json
+
+###

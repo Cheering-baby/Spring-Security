@@ -1,5 +1,24 @@
-# ???jwt key
+# Mysql数据库配置
+spring:
+  main:
+    allow-circular-references: true
+  datasource:
+    url: jdbc:mysql://localhost:3306/spring_security?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+# 自定义jwt key
 jwt:
-  tokenHeader: Authorization #JWT??????
-  secret: mySecret # JWT???????
-  expiration: 604800 # JWT??????60 * 60 * 24?
+  tokenHeader: Authorization #JWT Header
+  secret: mySecret # JWT秘钥
+  expiration: 604800 # JWT过期时间（60 * 60 * 24）
+
+# mybatis配置
+mybatis:
+  mapper-locations: # xml的位置
+    - classpath:mapper/*.xml
+    - classpath*:com/**/mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # sql日志打印
+    cache-enabled: true # 驼峰转换
