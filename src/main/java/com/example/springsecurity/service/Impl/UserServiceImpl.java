@@ -2,6 +2,7 @@ package com.example.springsecurity.service.Impl;
 
 import com.example.springsecurity.common.utils.JwtTokenUtil;
 import com.example.springsecurity.entity.User;
+import com.example.springsecurity.entity.UserPermission;
 import com.example.springsecurity.mapper.UserMapper;
 import com.example.springsecurity.service.UserService;
 import org.slf4j.Logger;
@@ -14,6 +15,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -38,6 +41,7 @@ public class UserServiceImpl implements UserService {
 
         try {
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            System.out.println(userDetails.toString());
             if(!passwordEncoder.matches(password, userDetails.getPassword())){
                 throw new BadCredentialsException("密码不正确");
             }
@@ -48,5 +52,10 @@ public class UserServiceImpl implements UserService {
             LOGGER.warn("登录异常: {}", e.getMessage());
         }
         return token;
+    }
+
+    @Override
+    public List<UserPermission> queryUserPermissionById(Integer id) {
+        return userMapper.queryUserPermissionById(id);
     }
 }

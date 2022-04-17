@@ -32,7 +32,7 @@ public class JwtTokenUtil {
        return Jwts.builder()
                .setClaims(claims) //
                .setExpiration(generateExpiration()) // 设置过期时间
-               .signWith(SignatureAlgorithm.ES512, secret) // 加密方式
+               .signWith(SignatureAlgorithm.HS512, secret) // 加密方式
                .compact();
    }
 
@@ -53,7 +53,7 @@ public class JwtTokenUtil {
         try {
             claims = Jwts.parser()
                     .setSigningKey(secret)
-                    .parseClaimsJwt(token)
+                    .parseClaimsJws(token)
                     .getBody();
         } catch (Exception e) {
           LOGGER.info("JWT格式验证失败, {}", token);
@@ -92,7 +92,7 @@ public class JwtTokenUtil {
 
     private boolean isTokenExpired(String token) {
         Date expireDate = getExpireDateFromToken(token);
-        return expireDate.before(new Date());
+        return expireDate.before(new Date(System.currentTimeMillis()));
     }
 
     /**
@@ -111,7 +111,7 @@ public class JwtTokenUtil {
     public String generateToken(UserDetails userDetails) {
        HashMap<String, Object> claims = new HashMap<>();
        claims.put(CLAIM_KEY_USERNAME, userDetails.getUsername());
-       claims.put(CLAIM_KEY_CREATED, new Date());
+       claims.put(CLAIM_KEY_CREATED, new Date(System.currentTimeMillis()));
        return generateToken(claims);
     }
 

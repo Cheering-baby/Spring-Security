@@ -48,6 +48,7 @@ INSERT INTO `ums_permission` VALUES ('2', '1', '商品列表', 'pms:product:read
 INSERT INTO `ums_permission` VALUES ('3', '1', '添加商品', 'pms:product:create', null, '1', '/pms/product/add', '1', NOW(), '0');
 INSERT INTO `ums_permission` VALUES ('4', '1', '商品分类', 'pms:productCategory:read', null, '1', '/pms/productCate/index', '1', NOW(), '0');
 INSERT INTO `ums_permission` VALUES ('5', '1', '商品类型', 'pms:productAttribute:read', null, '1', '/pms/productAttr/index', '1', NOW(), '0');
+INSERT INTO `ums_permission` VALUES ('6', '0', '通过username查询用户', 'ums:query:username', null, '1', '/user//queryUserByUsername', '1', NOW(), '0');
 
 -- ----------------------------
 -- Table structure for ums_admin_permission_relation
@@ -65,3 +66,4 @@ CREATE TABLE `ums_admin_permission_relation` (
 -- Records of ums_admin_permission_relation
 -- ----------------------------
 INSERT INTO `ums_admin_permission_relation` VALUES ("1", "1", "2", NULL);
+INSERT INTO `ums_admin_permission_relation` VALUES ("2", "1", "6", NULL);

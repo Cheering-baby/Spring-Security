@@ -6,6 +6,7 @@ import com.example.springsecurity.entity.User;
 import com.example.springsecurity.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -21,6 +22,7 @@ public class UserController {
     @Value("${jwt.tokenHeader}")
     private String tokenHeader;
 
+    @PreAuthorize("hasAuthority('ums:query:username')")
     @RequestMapping(value = "/queryUserByUsername", method = RequestMethod.GET)
     public CommonResult queryUserByUsername(@RequestParam String username) {
         User user = userService.queryUserByUsername(username);

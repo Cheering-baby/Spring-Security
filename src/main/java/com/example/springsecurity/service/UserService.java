@@ -1,6 +1,9 @@
 package com.example.springsecurity.service;
 
 import com.example.springsecurity.entity.User;
+import com.example.springsecurity.entity.UserPermission;
+
+import java.util.List;
 
 public interface UserService {
     /**
@@ -17,4 +20,6 @@ public interface UserService {
      * @return
      */
     String login(String username, String password);
+
+    List<UserPermission> queryUserPermissionById(Integer id);
 }

@@ -82,14 +82,14 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
 
     @Bean
     public UserDetailsService userDetailsService() {
-        // 获取登录用户信息
-        return username -> {
-            User admin = userService.queryUserByUsername(username);
-            if (admin != null) {
-                List<UserPermission> permissionList = new ArrayList<>();
-                return new AdminUserDetails(admin, permissionList);
-            }
-            throw new UsernameNotFoundException("用户名或密码错误");
-        };
+    // 获取登录用户信息
+    return username -> {
+      User admin = userService.queryUserByUsername(username);
+      if (admin != null) {
+        List<UserPermission> permissionList = userService.queryUserPermissionById(admin.getId());
+        return new AdminUserDetails(admin, permissionList);
+      }
+      throw new UsernameNotFoundException("用户名或密码错误");
+    };
     }
 }

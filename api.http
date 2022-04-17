@@ -9,5 +9,6 @@ Content-Type: application/json
 ###
 GET http://localhost:8080/user/queryUserByUsername?username=admin
 Accept: application/json
+Authorization: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhZG1pbiIsImNyZWF0ZWQiOjE2NTAxMzI5MzkwNzgsImV4cCI6MTY1MDczNzczOX0.pB0OMZJg11NqOWSi72G-XY-fN-el9bWS3bxDKyM07bytPXPVaVd-VC4IMYKmoPfO8vkFoe5l-ThhTSnvxYNCCg
 
 ###
