@@ -1,13 +1,16 @@
 package com.example.springsecurity.service.Impl;
 
+import cn.hutool.json.JSONUtil;
 import com.example.springsecurity.common.utils.JwtTokenUtil;
 import com.example.springsecurity.entity.User;
 import com.example.springsecurity.entity.UserPermission;
 import com.example.springsecurity.mapper.UserMapper;
+import com.example.springsecurity.service.RedisService;
 import com.example.springsecurity.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -29,10 +32,27 @@ public class UserServiceImpl implements UserService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    @Autowired
+    private RedisService redisService;
+
+    @Value("${redis.key.prefix.authCode}")
+    private String REDIS_KEY_PREFIX_AUTH_CODE;
+    @Value("${redis.key.expire.authCode}")
+    private Long AUTH_CODE_EXPIRE_SECONDS;
 
     @Override
     public User queryUserByUsername(String username) {
-        return userMapper.queryUserByName(username);
+        String userStr = redisService.get(REDIS_KEY_PREFIX_AUTH_CODE + username);
+        User user = null;
+        if(userStr == null) {
+            user = userMapper.queryUserByName(username);
+            redisService.set(REDIS_KEY_PREFIX_AUTH_CODE + username, JSONUtil.toJsonStr(user));
+            redisService.expire(REDIS_KEY_PREFIX_AUTH_CODE + username, AUTH_CODE_EXPIRE_SECONDS);
+        } else {
+            user = JSONUtil.toBean(userStr, User.class);
+        }
+
+        return user;
     }
 
     @Override
@@ -49,6 +69,7 @@ public class UserServiceImpl implements UserService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             token = jwtTokenUtil.generateToken(userDetails);
         } catch (Exception e) {
+            e.printStackTrace();
             LOGGER.warn("登录异常: {}", e.getMessage());
         }
         return token;
