@@ -1,11 +1,16 @@
 package com.example.springsecurity.service.Impl;
 
 import cn.hutool.json.JSONUtil;
+import com.example.springsecurity.common.api.UserResultCode;
+import com.example.springsecurity.common.exception.ApiException;
+import com.example.springsecurity.common.exception.ApiExceptionAsserts;
 import com.example.springsecurity.common.utils.JwtTokenUtil;
+import com.example.springsecurity.dto.AdminUserDetails;
 import com.example.springsecurity.entity.User;
 import com.example.springsecurity.entity.UserPermission;
 import com.example.springsecurity.mapper.UserMapper;
 import com.example.springsecurity.service.RedisService;
+import com.example.springsecurity.service.UserCacheService;
 import com.example.springsecurity.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +39,8 @@ public class UserServiceImpl implements UserService {
     private JwtTokenUtil jwtTokenUtil;
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private UserCacheService userCacheService;
 
     @Value("${redis.key.prefix.authCode}")
     private String REDIS_KEY_PREFIX_AUTH_CODE;
@@ -42,36 +49,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User queryUserByUsername(String username) {
-        String userStr = redisService.get(REDIS_KEY_PREFIX_AUTH_CODE + username);
         User user = null;
-        if(userStr == null) {
+        user = userCacheService.getUser(username);
+        if(user == null) {
             user = userMapper.queryUserByName(username);
-            redisService.set(REDIS_KEY_PREFIX_AUTH_CODE + username, JSONUtil.toJsonStr(user));
-            redisService.expire(REDIS_KEY_PREFIX_AUTH_CODE + username, AUTH_CODE_EXPIRE_SECONDS);
-        } else {
-            user = JSONUtil.toBean(userStr, User.class);
+            userCacheService.setUser(user);
         }
-
         return user;
     }
 
     @Override
     public String login(String username, String password) {
+
+        ApiExceptionAsserts.hasText(username, UserResultCode.USERNAME_REQUIRED);
+        ApiExceptionAsserts.hasText(password, UserResultCode.PASSWORD_REQUIRED);
+
         String token = null;
+        String status = null;
 
         try {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-            System.out.println(userDetails.toString());
+            AdminUserDetails userDetails = (AdminUserDetails) userDetailsService.loadUserByUsername(username);
+            status = userDetails.getStatus();
+
             if(!passwordEncoder.matches(password, userDetails.getPassword())){
                 throw new BadCredentialsException("密码不正确");
             }
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             token = jwtTokenUtil.generateToken(userDetails);
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             e.printStackTrace();
             LOGGER.warn("登录异常: {}", e.getMessage());
         }
+
+        if(status.equals("0")) {
+            throw new ApiException(UserResultCode.STATUS_LOCKED);
+        }
+
         return token;
     }
 

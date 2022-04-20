@@ -41,6 +41,10 @@ public class AdminUserDetails implements UserDetails {
         return user.getUsername();
     }
 
+    public String getStatus() {
+        return user.getStatus();
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

@@ -9,7 +9,7 @@ public class User {
     private Integer id;
     private String username;
     private String password;
-    private Integer status;
+    private String status;
 
     private List<UserPermission> permissionList;
 }
