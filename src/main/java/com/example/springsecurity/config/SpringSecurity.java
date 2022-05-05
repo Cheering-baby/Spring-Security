@@ -50,8 +50,8 @@ public class SpringSecurity extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers(HttpMethod.OPTIONS) // 跨域请求会有一次OPTIONS请求
                 .permitAll()
-//                .antMatchers("/**") // 测试验证，上线需要关闭
-//                .permitAll()
+                .antMatchers("/**") // 测试验证，上线需要关闭
+                .permitAll()
                 .anyRequest() // 除上面的所有请求全部需要鉴权认证
                 .authenticated();
         // 禁用缓存
